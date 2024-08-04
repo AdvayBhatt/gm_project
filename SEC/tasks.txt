@@ -1,0 +1,20 @@
+Tasks till finals:
+
+Data preprocessing
+- data cleaning
+- then regression, XGboost, normalization, decisions on qualitative features
+
+10/30- 
+- dataset for modeling 
+
+11/14
+- ML & fitting 
+
+Last week
+- write a report on how to present info
+
+
+
+STUDENT_SPRING_23:
+
+company_showcase: there was a 30 min showcase by company
