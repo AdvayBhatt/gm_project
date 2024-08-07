@@ -1,0 +1,128 @@
+
+Three different strategies for NaN handling (I've set NaN values in the columns I want to run the sentiment analyzer on to -1)
+
+I have done a test to see if the -1 values are random. They are (p-val 0.615):
+
+1. Imputation with the Mean or Median:
+
+weighing the benefits and costs:
+
+-1 value are random
+
+easy to do
+
+I'm concerned it may skew the data (i.e. there's often 100+ -1 values in these columns, they will all be the same value)
+
+2. I could also sample from the distribution of the non-negative values to impute the -1 values
+
+
+me weighing the benefits and costs:
+
+-1 values are random
+somewhat easy to do but not really conventional
+will not skew the data too much
+but I may not have enough non -1 data points to know the structure
+
+3. use algo to predict what -1 vals should be based on other data
+
+there are a lot of NaN values in the other columns
+However, there ARE columns like overall_score and other score columns that are numerical that would help prediction here, I'd just have to spend a lot of time cleaning them
+
+
+SOLUTION:
+
+------------------------------------------------------------------
+this was the original idea I had when dealing with multiple dfs of different row length. 
+I had selected some select columns to extract sentiment from in a sentiments_df column. For the row mismatch when merging, the extra rows for some columns were set to NaN values
+
+this proved a hastle to deal with since I would have to then combine the original dfs when I do ML.
+
+#SETTING EVERY DF TO HAVE 203 ROWS
+
+max_rows = max(df.shape[0] for df in dfs)
+print(f"Maximum rows: {max_rows}")
+
+# Initialize an empty DataFrame for combined sentiment data
+all_sentiments_df = pd.DataFrame()
+
+# Process each DataFrame
+for df, title in zip(dfs, titles):
+    # Extract sentiment columns
+    sentiment_columns = [col for col in df.columns if '_sentiment_' in col]
+    sentiment_data = df[sentiment_columns].copy()
+
+    # Add a semester column
+    sentiment_data['semester'] = title
+
+    # Reset index
+    sentiment_data.reset_index(drop=True, inplace=True)
+
+    # Pad DataFrame with NaN values if it has fewer rows than max_rows
+    if len(sentiment_data) < max_rows:
+        # Create a DataFrame with NaN values to pad
+        padding_df = pd.DataFrame(np.nan, index=range(max_rows - len(sentiment_data)), columns=sentiment_data.columns)
+        # Concatenate the padding DataFrame to the sentiment_data DataFrame
+        sentiment_data = pd.concat([sentiment_data, padding_df], ignore_index=True)
+    
+    # Verify the padded DataFrame
+    print(f"{title} DataFrame shape after padding: {sentiment_data.shape}")
+
+    # Concatenate this DataFrame to the main DataFrame
+    all_sentiments_df = pd.concat([all_sentiments_df, sentiment_data], axis=1)
+
+# Verify the combined DataFrame
+all_sentiments_df.reset_index(drop=True, inplace=True)
+
+print(f"Combined DataFrame shape: {all_sentiments_df.shape}")
+
+
+#PUTTING MEAN ROUNDED VALUES FOR NON-NUMERIC NAN VALUES
+
+#we don't care about the mean of the entire df.
+#We want the mean of each column and then we'll iterate over eahc of the 4 column 
+#we'll putting each column's unique mean in the NaN values. 
+#ALSO, we don't  want a score in the decimals. 
+#The mean value must either step up or down based on closeness to 0 or 1 
+
+# Iterate through each column
+# Select only the numeric columns from the DataFrame
+numeric_columns = all_sentiments_df.select_dtypes(include=['int64', 'float64'])
+
+# Iterate through each numeric column
+for col in numeric_columns.columns:
+    # Calculate the mean of the column, ignoring NaNs
+    col_mean = numeric_columns[col].mean()
+
+    # Round the mean to the nearest integer
+    rounded_mean = round(col_mean)
+
+    # Fill NaN values with the rounded mean
+    all_sentiments_df[col].fillna(rounded_mean, inplace=True)
+
+# Now you can proceed with further analysis or visualizations
+all_sentiments_df
+
+all_sentiments_df.isna().sum()
+all_sentiments_df.drop(all_sentiments_df['semester'], axis = 1, inplace = True)
+
+#VISUALIZATION:
+
+average_scores = all_sentiments_df.mean()
+
+
+average_scores_df = pd.DataFrame({
+    'Sentiment Category': average_scores.index,
+    'Average Sentiment Score': average_scores.values
+})
+
+plt.figure(figsize=(10, 6))
+sns.barplot(data=average_scores_df, x='Sentiment Category', y='Average Sentiment Score', hue = 'overall_rating')
+
+# Customize the plot
+plt.title('Average Sentiment Scores Across Different Categories')
+plt.xlabel('Sentiment Category')
+plt.ylabel('Average Sentiment Score')
+plt.ylim(0, 5)
+plt.xticks(rotation=90)
+
+plt.show()
