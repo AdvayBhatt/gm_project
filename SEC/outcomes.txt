@@ -1,0 +1,6 @@
+------------------------------------------------------------
+Outcomes:
+There was a great decrease in the proportion of students attending the company showcase from 2021 to 2022, and a slight decrease from 2022 to 2023
+
+The distribution of nonresponsive answers in fall 2022's feedback_communication_sentiment_fall_2022 is not random (p val = 0.04), indicating some latent factor/s that influenced student's response rate. For all other semesters, the distributions were random
+
