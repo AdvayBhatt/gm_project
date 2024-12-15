@@ -1,16 +1,19 @@
 Tasks:
 
+Imports and load datasets
+- decide: combine dfs together or work with each independently? Nr. rows are different AND questions differ across datasets
+
 Data preprocessing
-- data cleaning
-- then regression, XGboost, normalization, decisions on qualitative features
+- data cleaning (unbalanced data, Lots of NA, will need to predict NaN for overall_rating)
+- data exploration
+- regression, XGboost, normalization, decisions on qualitative features
+
+ML & fitting 
+- since we're working towards predicting a target of overall_rating, should we use regression or classification? I can see the rating goes up to 10 AND the ratings are discrete, so by technicality this would be classification.
+
+Parameter tuning 
 
 
-- dataset for modeling 
-
-
-- ML & fitting 
-
-Last week
-- write a report on how to present info
+Write a report on how to present info
 
 

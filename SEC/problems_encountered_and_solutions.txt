@@ -1,4 +1,7 @@
 
+#################PREPROCESSING: NAN#######################
+
+
 Three different strategies for NaN handling (I've set NaN values in the columns I want to run the sentiment analyzer on to -1)
 
 I have done a test to see if the -1 values are random. They are (p-val 0.615):
@@ -16,9 +19,9 @@ I'm concerned it may skew the data (i.e. there's often 100+ -1 values in these c
 2. I could also sample from the distribution of the non-negative values to impute the -1 values
 
 
-me weighing the benefits and costs:
+weighing the benefits and costs:
 
--1 values are random
+the -1 values are random
 somewhat easy to do but not really conventional
 will not skew the data too much
 but I may not have enough non -1 data points to know the structure
@@ -30,6 +33,26 @@ However, there ARE columns like overall_score and other score columns that are n
 
 
 SOLUTION:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ------------------------------------------------------------------
 this was the original idea I had when dealing with multiple dfs of different row length. 
